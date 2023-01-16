@@ -5,4 +5,4 @@
 ## Notes: Yells- "I've been Sapped" to alert those around you whenever a rogue saps you. 
 ## X-Category: Battlegrounds/PvP, Chat/Communication
 
-SaySapped.lua
+YellSapped.lua
