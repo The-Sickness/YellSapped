@@ -1,0 +1,8 @@
+## Interface: 100005
+## Title: YellSapped
+## Author: Sharpedge_Gaming
+## Version: v.1.0
+## Notes: Yells- "I've been Sapped" to alert those around you whenever a rogue saps you. 
+## X-Category: Battlegrounds/PvP, Chat/Communication
+
+YellSapped.lua
