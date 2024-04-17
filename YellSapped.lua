@@ -1,4 +1,7 @@
--- Import the Ace3 libraries
+--YellSapped--
+--Sharpedge_Gaming--
+--v.1.6
+
 local AceAddon = LibStub("AceAddon-3.0"):NewAddon("YellSapped", "AceConsole-3.0", "AceEvent-3.0")
 local AceConfig = LibStub("AceConfig-3.0")
 local AceConfigDialog = LibStub("AceConfigDialog-3.0")
@@ -9,49 +12,49 @@ local messages = {
     "Sapped! Need some help!",
     "Someone just sapped me!",
     "Just got sapped!",
-	"Rogue is here!",
-    -- ... and so on, up to 10 messages or however many you want
+    "Rogue is here!",
+    "Feeling woozy, sapped again!",
+    "Sapped and trapped, assistance required!",
+    "Rogue's tricks got me sapped!",
+    "Sapped! Where did that come from?",
+    "Help! I've been hit by a sap!",
+    "Under the rogue's spell, sapped!",
+    "Sapped in the shadows, rogue nearby!",
+    "Beware, rogue sapped me out of nowhere!",
+    "Can't move, sapped by a sneaky rogue!",
+    "Rogue alert! Just got sapped again!"
 }
 
--- Define your default settings
+-- Define default settings
 local defaults = {
     profile = {
         selectedMessage = 1, -- Default to the first message
     },
 }
 
--- Initialize the addon
 function AceAddon:OnInitialize()
-    -- Load saved variables
     self.db = LibStub("AceDB-3.0"):New("YellSappedDB", defaults, true)
 
-    -- Register the options table
     AceConfig:RegisterOptionsTable("YellSapped", self:GetOptions())
-    
-    -- Add the options to the Blizzard Interface Options
     AceConfigDialog:AddToBlizOptions("YellSapped", "YellSapped")
 
-    -- Create the frame
-    local YellSapped = CreateFrame("Frame")
-    YellSapped.playername = UnitName("player")
+    local addon = self  
+    local YellSappedFrame = CreateFrame("Frame")
 
-    YellSapped:SetScript("OnEvent", function(self, evt)   
-        if( evt == "COMBAT_LOG_EVENT_UNFILTERED" )then
-            local _, event, _, _, sourceName, _, _, _, dstName, _,_,spellId = CombatLogGetCurrentEventInfo()
-
-            if( (spellId == 6770)
-                and (dstName == YellSapped.playername)
-                and (event == "SPELL_AURA_APPLIED" or event == "SPELL_AURA_REFRESH")
-                )then
-                -- Use the selected message from the messages table
-                SendChatMessage(messages[AceAddon.db.profile.selectedMessage],"YELL")
-                DEFAULT_CHAT_FRAME:AddMessage("Sapped by: "..(sourceName or "(unknown)"))
+    YellSappedFrame:SetScript("OnEvent", function(_, evt)
+        if evt == "COMBAT_LOG_EVENT_UNFILTERED" then
+            local _, event, _, _, sourceName, _, _, _, dstName, _, _, spellId = CombatLogGetCurrentEventInfo()
+            if spellId == 6770 and dstName == UnitName("player") and (event == "SPELL_AURA_APPLIED" or event == "SPELL_AURA_REFRESH") then
+                local inInstance, instanceType = IsInInstance()
+                if (inInstance and (instanceType == "pvp" or instanceType == "arena")) or GetPVPInfo() then
+                    SendChatMessage(messages[addon.db.profile.selectedMessage], "YELL")
+                    DEFAULT_CHAT_FRAME:AddMessage("Sapped by: "..(sourceName or "(unknown)"))
+                end
             end
-            
         end
     end)
 
-    YellSapped:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+    YellSappedFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
     DEFAULT_CHAT_FRAME:AddMessage("YellSapped is loaded")
 end
 
@@ -62,15 +65,46 @@ function AceAddon:GetOptions()
         type = "group",
         args = {
             selectedMessage = {
+                order = 1,
                 type = "select",
                 name = "Selected Message",
                 desc = "Choose the message to yell when sapped",
-                values = messages, -- This will automatically fill in the dropdown with your message options
+                values = messages, 
                 get = function(info) return self.db.profile.selectedMessage end,
-                set = function(info, newValue) self.db.profile.selectedMessage = newValue end,
+                set = function(info, newValue)
+                    self.db.profile.selectedMessage = newValue
+                    
+                end,
+            },
+            messagePreview = {
+                order = 2,
+                type = "description",
+                name = function()
+                    return "Preview: " .. messages[self.db.profile.selectedMessage]
+                end,
+				},
+				outputChannel = {
+    order = 3,
+    type = "select",
+    name = "Output Channel",
+    desc = "Choose where to send the sapped message",
+    values = {
+    ["YELL"] = "Yell",
+    ["SAY"] = "Say",
+    ["PARTY"] = "Party",
+    ["RAID"] = "Raid",
+    ["GUILD"] = "Guild",
+    ["OFFICER"] = "Officer",
+
+    },
+    get = function(info) return self.db.profile.outputChannel end,
+    set = function(info, value)
+        self.db.profile.outputChannel = value
+    end,
             },
         },
     }
     return options
 end
+
 
