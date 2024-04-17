@@ -1,7 +1,7 @@
-## Interface: 100205
+## Interface: 100206
 ## Title: YellSapped
 ## Author: Sharpedge_Gaming
-## Version: v.1.2
+## Version: v.1.6
 ## Notes: Yells- "I've been Sapped" to alert those around you whenever a rogue saps you. 
 ## X-Category: Battlegrounds/PvP, Chat/Communication
 ## IconTexture: 132310
@@ -15,7 +15,5 @@ Libs\AceEvent-3.0\AceEvent-3.0.lua
 Libs\AceDB-3.0\AceDB-3.0.lua
 Libs\AceConfig-3.0\AceConfig-3.0.lua
 Libs\AceConfigDialog-3.0\AceConfigDialog-3.0.lua
-
-
 
 YellSapped.lua
